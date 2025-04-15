@@ -63,6 +63,7 @@ class WithZCU102Tweaks extends Config(
 )
 
 class RocketZCU102Config extends Config(
+  new WithoutCompressedRocket ++
   new WithFPGAFrequency(25) ++
   new WithZCU102Tweaks ++
   new chipyard.RocketConfig)
