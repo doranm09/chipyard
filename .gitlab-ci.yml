@@ -18,15 +18,16 @@
 
 stages:          # List of stages for jobs, and their order of execution
   - build
-  - test
-  - deploy
 build-job:       
   stage: build
   tags:
   - shell
   - aberdeen
   - vivado
+  before_script:
+    - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.dornerworks.com/usarmy-aberdeen_sbir".insteadOf git@gitlab.dornerworks.com:usarmy-aberdeen_sbir
   script:
+  - source /opt/miniforge3/etc/profile.d/conda.sh
   - echo "start chipyard framework setup"
   - ./build-setup.sh --skip-marshal --skip-toolchain
   - echo "finished chipyard framework setup"
@@ -36,3 +37,5 @@ build-job:
   - cd fpga && make SUB_PROJECT=zcu102 verilog
   - source /opt/Xilinx/Vivado/2024.1/settings64.sh
   - make SUB_PROJECT=zcu102 bitstream
+  after_script:
+    - git config --global --remove-section url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.dornerworks.com/usarmy-aberdeen_sbir"
