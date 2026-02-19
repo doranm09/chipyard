@@ -9,19 +9,19 @@ Prerequisites
 
 1. Linux host with Conda installed.
 2. Vivado installed (expected path in this repo: ``/opt/Xilinx/2025.1/Vivado``).
-3. Access to internal GitLab submodules:
+3. Access to required submodules:
 
-   * ``git@gitlab.dornerworks.com:usarmy-aberdeen_sbir/fpga/fpga-shells.git``
-   * ``git@gitlab.dornerworks.com:usarmy-aberdeen_sbir/generators/rocket-chip.git``
+   * ``https://github.com/ucb-bar/fpga-shells.git``
+   * ``https://github.com/chipsalliance/rocket-chip.git``
 
 Repository Bootstrap
 --------------------
 
-1. Ensure GitLab SSH is working:
+1. Ensure GitHub SSH is working:
 
    .. code-block:: shell
 
-      ssh -T git@gitlab.dornerworks.com
+      ssh -T git@github.com
 
 2. Run setup once (lean mode skips FireSim/FireMarshal):
 
@@ -109,7 +109,8 @@ and runs ``sdboot``. The sequence is:
 1. Enable UART TX (MMIO UART at ``0x64000000``), then print ``INIT``.
 2. Initialize SD in SPI mode.
 3. Read payload from SD sector ``34`` (hardcoded) into RAM at ``0x80000000``.
-4. Print ``BOOT`` and jump to ``0x80000000``.
+4. On success, print ``BOOT`` and jump to ``0x80000000``.
+5. On failure, print ``ERROR`` and halt (no payload jump).
 
 Smoke Test SD Payload (Hello World)
 -----------------------------------
@@ -149,6 +150,9 @@ Connect to UART (adjust tty as needed):
 
 Expected serial output includes: ``INIT``, ``LOADING ...``, ``BOOT``, and
 ``Hello from payload at 0x80000000!``.
+
+If SD init/read fails, expected serial output ends with ``ERROR`` and the core
+stays in a halt loop.
 
 Notes
 -----

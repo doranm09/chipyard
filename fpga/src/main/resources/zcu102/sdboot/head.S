@@ -10,8 +10,13 @@
 _prog_start:
   li sp, 0x800ff000  // Some high memory location for your stack
   call main                  // Call C code to load from SD card
+  bnez a0, _boot_fail        // If main returns non-zero, halt after reporting error
   la t0, payload_start       // Load address of loaded payload
   jr t0                      // Jump to payload (must be PIC)
+
+_boot_fail:
+  wfi
+  j _boot_fail
 
 .section .bss
 .align 12
