@@ -86,8 +86,8 @@ class ZCU102FPGATestHarness(override implicit val p: Parameters) extends ZCU102S
   )))))
   ddrNode := TLWidthWidget(dp(ExtTLMem).get.master.beatBytes) := ddrClient
 
-  // val ledOverlays = dp(LEDOverlayKey).map(_.place(LEDDesignInput()))
-  // val all_leds = ledOverlays.map(_.overlayOutput.led)
+  val ledOverlays = dp(LEDOverlayKey).map(_.place(LEDDesignInput()))
+  val all_leds = ledOverlays.map(_.overlayOutput.led)
   // val status_leds = all_leds.take(3)
   // val reset_led  = all_leds(4)
   // val other_leds = all_leds.drop(4)
@@ -129,6 +129,12 @@ class ZCU102FPGATestHarnessImp(_outer: ZCU102FPGATestHarness) extends LazyRawMod
   val sys_clk_mhz = _outer.sysClkNode.out.head._1.clock
   val clk_50mhz = _outer.dutClock.in.head._1.clock
   val clk_300mhz = _outer.sysClkNode.out.head._2.clock //What is this?
+
+  // Place holder for now.  These LEDs will be driven by Core/Monitor signals
+  // drive every LED high:
+  _outer.all_leds.foreach { ledPin =>
+    ledPin := true.B
+  }
 
   // Blink the status LEDs for sanity
   // withClockAndReset(sys_clk_mhz, _outer.pllReset) {
