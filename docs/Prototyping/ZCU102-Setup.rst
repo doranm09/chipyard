@@ -100,6 +100,56 @@ Build Targets
       cd fpga
       make SUB_PROJECT=zcu102 bitstream -j8
 
+Serial Bootstrap Flow
+---------------------
+
+After programming the FPGA, reset starts from the BootROM region at ``0x10000``
+and runs ``sdboot``. The sequence is:
+
+1. Enable UART TX (MMIO UART at ``0x64000000``), then print ``INIT``.
+2. Initialize SD in SPI mode.
+3. Read payload from SD sector ``34`` (hardcoded) into RAM at ``0x80000000``.
+4. Print ``BOOT`` and jump to ``0x80000000``.
+
+Smoke Test SD Payload (Hello World)
+-----------------------------------
+
+Build the payload:
+
+.. code-block:: shell
+
+   source scripts/sourceme-zcu102.sh
+   make -C fpga/src/main/resources/zcu102/tests clean bin
+
+Preview flash command (safe dry run):
+
+.. code-block:: shell
+
+   ./scripts/zcu102-smoketest-sd.sh --target /dev/sdX --seek-sectors 34
+
+Flash to SD (writes raw sector 34 on the device):
+
+.. code-block:: shell
+
+   ./scripts/zcu102-smoketest-sd.sh --target /dev/sdX --seek-sectors 34 --write
+
+If you already created a partition that starts at sector 34, write at partition
+offset 0 instead:
+
+.. code-block:: shell
+
+   ./scripts/zcu102-smoketest-sd.sh --target /dev/sdX1 --seek-sectors 0 --write
+
+Connect to UART (adjust tty as needed):
+
+.. code-block:: shell
+
+   ls /dev/ttyUSB*
+   screen -S ZCU102_UART /dev/ttyUSB1 115200
+
+Expected serial output includes: ``INIT``, ``LOADING ...``, ``BOOT``, and
+``Hello from payload at 0x80000000!``.
+
 Notes
 -----
 
