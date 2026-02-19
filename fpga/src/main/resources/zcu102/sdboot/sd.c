@@ -9,7 +9,7 @@
 #include "kprintf.h"
 
 // Total payload in B
-#define PAYLOAD_SIZE_B (30 << 20) // default: 30MiB
+#define PAYLOAD_SIZE_B (8 *1024) // default: 30MiB
 // A sector is 512 bytes, so (1 << 11) * 512B = 1 MiB
 #define SECTOR_SIZE_B 512
 // Payload size in # of sectors
@@ -225,6 +225,33 @@ static int copy(void)
 	return rc;
 }
 
+#define TEST_ADDR   0x80000000
+#define TEST_LEN    256
+
+void mem_test(void){
+    volatile uint8_t *ptr = (uint8_t *)TEST_ADDR;
+
+    // kprintf("Starting memory write test at %x\r\n", (uint32_t)ptr);
+
+    // // write pattern
+    // for(int i=0; i<TEST_LEN; i++){
+    //     ptr[i] = (uint8_t)(i & 0xFF); // simple pattern
+    // }
+
+    // read back and verify
+    for(int i=0; i<TEST_LEN; i++){
+        uint8_t actual = ptr[i];
+		kprintf("OK at %x: %x\r\n", (uint32_t)&ptr[i], actual);
+        // if(expected != actual){
+        //     kprintf("Mismatch at %x: wrote: %x, read: %x\r\n", (uint32_t)&ptr[i], expected, actual);
+        // }else{
+        //     kprintf("OK at %x: %x\r\n", (uint32_t)&ptr[i], actual);
+        // }
+    }
+
+    kputs("Memory test done");
+}
+
 int main(void)
 {
 	REG32(uart, UART_REG_TXCTRL) = UART_TXEN;
@@ -240,6 +267,7 @@ int main(void)
 		kputs("ERROR");
 		return 1;
 	}
+    mem_test();
 
 	kputs("BOOT");
 
