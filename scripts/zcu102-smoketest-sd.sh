@@ -75,14 +75,26 @@ PAYLOAD_MAX_BYTES=8192
 
 if [[ "${DO_BUILD}" -eq 1 ]]; then
   if ! command -v riscv64-unknown-elf-gcc >/dev/null 2>&1; then
+    if [[ -d "${CY_DIR}/.conda-env/riscv-tools/bin" ]]; then
+      export RISCV="${CY_DIR}/.conda-env/riscv-tools"
+      export PATH="${CY_DIR}/.conda-env/riscv-tools/bin:${PATH}"
+    fi
+  fi
+  if ! command -v riscv64-unknown-elf-gcc >/dev/null 2>&1; then
     if [[ -f "${CY_DIR}/env.sh" ]]; then
       # shellcheck disable=SC1091
-      source "${CY_DIR}/env.sh"
+      if ! source "${CY_DIR}/env.sh"; then
+        echo "Warning: failed to source env.sh, continuing with current PATH." >&2
+      fi
     fi
   fi
   if ! command -v riscv64-unknown-elf-gcc >/dev/null 2>&1; then
     echo "riscv64-unknown-elf-gcc not found. Source env.sh first." >&2
     exit 1
+  fi
+  if [[ -z "${RISCV:-}" ]]; then
+    RISCV_BIN_DIR="$(dirname "$(command -v riscv64-unknown-elf-gcc)")"
+    export RISCV="$(dirname "${RISCV_BIN_DIR}")"
   fi
 
   make -C "${HELLO_DIR}" clean bin
