@@ -18,6 +18,23 @@
 #endif
 static volatile uint32_t * const uart = (void *)(UART_CTRL_ADDR);
 
+// Initialize UART with a fixed baud and enable TX/RX.
+#ifndef UART_BAUD_RATE
+#define UART_BAUD_RATE 115200UL
+#endif
+
+#ifndef TL_CLK
+#error Must define TL_CLK
+#endif
+
+static inline void uart_init(void)
+{
+	uint32_t div = (uint32_t)((TL_CLK + UART_BAUD_RATE - 1) / UART_BAUD_RATE - 1);
+	REG32(uart, UART_REG_DIV) = div;
+	REG32(uart, UART_REG_TXCTRL) = UART_TXEN;
+	REG32(uart, UART_REG_RXCTRL) = UART_RXEN;
+}
+
 static inline void kputc(char c)
 {
 	volatile uint32_t *tx = &REG32(uart, UART_REG_TXFIFO);

@@ -8,7 +8,7 @@
 #include "kprintf.h"
 
 void main(void) {
-	REG32(uart, UART_REG_TXCTRL) = UART_TXEN;
+	uart_init();
     kputs("Hello from payload at 0x80000000!\r\n");
     while (1);
 }

@@ -254,7 +254,7 @@ void mem_test(void){
 
 int main(void)
 {
-	REG32(uart, UART_REG_TXCTRL) = UART_TXEN;
+	uart_init();
 
 	kputs("INIT");
 	sd_poweron();
