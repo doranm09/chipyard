@@ -100,3 +100,8 @@ class UARTTSIRocketConfig extends Config(
   new chipyard.config.WithUniformBusFrequencies(2) ++
   new freechips.rocketchip.rocket.WithNHugeCores(1) ++         // single rocket-core
   new chipyard.config.AbstractConfig)
+
+class FSMTraceSinkRocketConfig extends Config(
+  new chipyard.config.WithFSMTraceSink ++
+  new freechips.rocketchip.rocket.WithNHugeCores(1) ++
+  new chipyard.config.AbstractConfig)

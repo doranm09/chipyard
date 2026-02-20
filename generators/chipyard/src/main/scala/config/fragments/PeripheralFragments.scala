@@ -5,7 +5,7 @@ import chisel3._
 import chisel3.util.{log2Up}
 
 import org.chipsalliance.cde.config.{Config}
-import freechips.rocketchip.devices.tilelink.{BootROMLocated, PLICKey, CLINTKey}
+import freechips.rocketchip.devices.tilelink.{BootROMLocated, PLICKey, CLINTKey, FSMTraceSinkKey, FSMTraceSinkParams}
 import freechips.rocketchip.devices.debug.{Debug, ExportDebug, DebugModuleKey, DMI, JtagDTMKey, JtagDTMConfig}
 import freechips.rocketchip.prci.{AsynchronousCrossing}
 import chipyard.stage.phases.TargetDirKey
@@ -183,4 +183,20 @@ class WithNoBusErrorDevices extends Config((site, here, up) => {
 
 class WithPeripheryTimer(timerParams: TimerParams = TimerParams(0x4000)) extends Config((site, here, up) => {
   case PeripheryTimerKey => Seq(timerParams)
+})
+
+class WithFSMTraceSink(
+  baseAddress: BigInt = 0x10050000L,
+  sizeBytes: BigInt = 0x1000L,
+  fifoDepth: Int = 256,
+  maxTransitions: Int = 64,
+  defaultStartId: BigInt = 1
+) extends Config((site, here, up) => {
+  case FSMTraceSinkKey => Some(FSMTraceSinkParams(
+    baseAddress = baseAddress,
+    sizeBytes = sizeBytes,
+    fifoDepth = fifoDepth,
+    maxTransitions = maxTransitions,
+    defaultStartId = defaultStartId
+  ))
 })
